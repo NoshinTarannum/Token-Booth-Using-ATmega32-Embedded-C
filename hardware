@@ -3,7 +3,7 @@
 
 char digit_cathode[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 char b10 = 0, b11 = 0, b20 = 0, b21 = 0;
-char press1 = 0, press2 = 0;
+char press1 = 0;
 
 interrupt [EXT_INT0] void ext_int0_isr(void)
 {
@@ -20,12 +20,12 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
 
 interrupt [EXT_INT1] void ext_int1_isr(void)
 {
-    press2++;
-    b20 = press2 % 10;
-    b21 = press2 / 10;
-    if (press2 > 99)
+    press1++;
+    b20 = press1 % 10;
+    b21 = press1 / 10;
+    if (press1 > 99)
     {
-        press2 = 0;
+        press1 = 0;
         b20 = 0;
         b21 = 0;
     }
