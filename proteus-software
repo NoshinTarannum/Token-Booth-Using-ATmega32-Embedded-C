@@ -1,0 +1,59 @@
+#include <mega32.h>
+#include <delay.h>
+ 
+char digit_cathode[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+char b10 = 0, b11 = 0, b20 = 0, b21 = 0;
+char press1 = 0, press2 = 0;
+ 
+interrupt [EXT_INT0] void ext_int0_isr(void)
+{
+	press1++;
+	b10 = press1 % 10;
+	b11 = press1 / 10;
+	if (press1 > 99)
+	{
+    	press1 = 0;
+    	b10 = 0;
+    	b11 = 0;
+	}
+}
+ 
+interrupt [EXT_INT1] void ext_int1_isr(void)
+{
+	press2++;
+	b20 = press2 % 10;
+	b21 = press2 / 10;
+	if (press2 > 99)
+	{
+    	press2 = 0;
+    	b20 = 0;
+      b21 = 0;
+	}
+}
+ 
+void main(void)
+{
+	DDRA = 0xFF;
+	DDRC = 0xFF;
+	DDRB = 0x0F;
+	GICR |= (1 << INT1) | (1 << INT0) | (0 << INT2);
+	MCUCR = (1 << ISC11) | (0 << ISC10) | (1 << ISC01) | (0 << ISC00);
+ 
+	#asm("sei")
+ 
+	while(1)
+    	{        	
+    	PORTB = 0b11111110;
+    	PORTA = digit_cathode[b11];
+    	delay_ms(10);
+    	PORTB = 0b11111101;
+    	PORTA = digit_cathode[b10];
+    	delay_ms(10);
+      PORTB = 0b11111011;
+    	PORTC = digit_cathode[b21];
+    	delay_ms(10);
+    	PORTB = 0b11110111;
+    	PORTC = digit_cathode[b20];
+    	delay_ms(10);
+    	}
+}
